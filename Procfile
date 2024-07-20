@@ -1,1 +1,1 @@
-web: python -DPORT=$PORT main.py
+web: python main.py
