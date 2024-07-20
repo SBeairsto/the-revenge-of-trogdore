@@ -13,7 +13,6 @@
 import random
 import typing
 
-t = 1
 
 # info is called when you create your Battlesnake on play.battlesnake.com
 # and controls your Battlesnake's appearance
