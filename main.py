@@ -211,7 +211,22 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                     move_rating,
                                     board_height,
                                     board_width,
+                                    weight=-0.1)
+    
+    dict_tuples = [tuple(d.items()) for d in snake_density]
+    # Count occurrences of each dictionary (as tuples)
+    counts = Counter(dict_tuples)
+    # Filter dictionaries with at least 3 duplicates
+    dense_tiles = [dict(tpl) for tpl, count in counts.items() if count >= 3]
+
+    move_rating = minimize_distance(my_head,
+                                    my_potential_movements,
+                                    dense_tiles,
+                                    move_rating,
+                                    board_height,
+                                    board_width,
                                     weight=-0.3)
+
 
 
     # Step 4 - Move towards food instead of random, to regain health and survive longer
