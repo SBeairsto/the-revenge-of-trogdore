@@ -203,7 +203,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     # Count occurrences of each dictionary (as tuples)
     counts = Counter(dict_tuples)
     # Filter dictionaries with at least 3 duplicates
-    dense_tiles = [dict(tpl) for tpl, count in counts.items() if count >= 4]
+    dense_tiles = [dict(tpl) for tpl, count in counts.items() if count >= 3]
 
     move_rating = minimize_distance(my_head,
                                     my_potential_movements,
