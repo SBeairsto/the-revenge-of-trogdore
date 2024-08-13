@@ -135,7 +135,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                     move_rating,
                                     board_height,
                                     board_width,
-                                    max_dist = 1,
+                                    max_dist = 2,
                                     weight=-0.4)
 
 
