@@ -142,26 +142,27 @@ def move(game_state: typing.Dict) -> typing.Dict:
 
     # Step 4 - Move towards food instead of random, to regain health and survive longer
     food = game_state['board']['food']
-    am_I_hungry = False
+    am_I_hungry = True
     am_I_hunting = False
     
-    if len(game_state['board']['snakes']) == 1:
+    if solo:
         length_diff = 0
     else:
         length_diff = game_state['you']['length'] - enemy_length
 
     # weight how hungry you are based on how much larger of a snake you are.
     # If you are way bigger, press your advantage
-    if game_state['you']['health'] < 15:
-        am_I_hungry = True
-        am_I_hunting = False
-    
     if length_diff >= 2:
         am_I_hunting = True
         am_I_hungry = False
     else:
         am_I_hunting = False
         am_I_hungry = True
+
+    # if you are low health, you NEED to go get food
+    if game_state['you']['health'] < 15:
+        am_I_hungry = True
+        am_I_hunting = False
 
     if am_I_hungry:
         move_rating, close_food = snake_functions.minimize_distance(my_head,
