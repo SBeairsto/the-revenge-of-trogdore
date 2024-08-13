@@ -10,8 +10,8 @@
 # To get you started we've included code to prevent your Battlesnake from
 # moving backwards.For more info see docs.battlesnake.com
 
-import random
 import typing
+from collections import Counter
 import snake_classes
 import snake_functions
 from snake_classes import potential_movements
@@ -47,76 +47,69 @@ def end(game_state: typing.Dict):
 # See https://docs.battlesnake.com/api/example-move for available data
 def move(game_state: typing.Dict) -> typing.Dict:
 
+    moves = ["up", "down", "right", "left"]
     is_move_safe = {"up": True, "down": True, "left": True, "right": True}
 
-    # We've included code to prevent your Battlesnake from moving backwards
+    # Step 1 - Extract usefull information from the game_state
     my_head = game_state["you"]["body"][0]  # Coordinates of your head
     my_id = game_state["you"]["id"]
 
-    my_potential_movements = snake_classes.potential_movements(head=my_head)
-
-    # Step 1 - Prevent your Battlesnake from moving out of bounds
     board_width = game_state['board']['width']
     board_height = game_state['board']['height']
+    solo = len(game_state['board']['snakes']) == 1
+
     my_board = snake_classes.board(board_width, board_height)
     walls = my_board.wall
-
-    is_move_safe = snake_functions.check_move(is_move_safe,
-                              my_potential_movements,
-                              walls)
-
-    # Step 2 - Prevent your Battlesnake from colliding with itself or
-    # other Battlesnakes
     all_snakes = snake_classes.snakes(game_state=game_state)
-    is_move_safe = snake_functions.check_move(is_move_safe,
-                              my_potential_movements,
-                              all_snakes.meat)
+    my_potential_movements = snake_classes.potential_movements(head=my_head)
 
+    ### CHECK FOR UNSAFE MOVES
+    # Step 2 - Prevent your Battlesnake from moving out of bounds
+    is_move_safe = snake_functions.check_move(is_move_safe,
+                                              my_potential_movements,
+                                              walls)
+
+    # Step 3 - Prevent your Battlesnake from colliding with itself or
+    # other Battlesnakes
+    is_move_safe = snake_functions.check_move(is_move_safe,
+                                              my_potential_movements,
+                                              all_snakes.meat)
+
+    # we will adjust move_rating depending on how beneficial each move is
     move_rating = {'up': 1, 'down': 1, 'left': 1, 'right': 1}
+
+    # if a move is not safe (will cause us to immediately lose) we give it
+    # a -100 rating.
     for move, isSafe in is_move_safe.items():
         if not isSafe:
             move_rating[move] = -100
 
-    # Choose the best move from the safe ones
+    ### CHOSE BEST MOVE FROM SAFE ONES
 
     # Step 3 - Prevent your Battlesnake from moving to the same square as
     # a larger snake
 
-    for enemy in game_state['board']['snakes']:
-        if enemy['id'] != my_id:
-            enemy_potential_movements = snake_classes.potential_movements(enemy['head'])
-            enemy_length = enemy['length']
-            enemy_head = enemy['head']
-            if enemy['length'] >= game_state['you']['length']:
-                if my_potential_movements.up in enemy_potential_movements.all:
-                    move_rating["up"] -= 0.5
-                if my_potential_movements.down in enemy_potential_movements.all:
-                    move_rating["down"] -= 0.5
-                if my_potential_movements.right in enemy_potential_movements.all:
-                    move_rating["right"] -= 0.5
-                if my_potential_movements.left in enemy_potential_movements.all:
-                    move_rating["left"] -= 0.5
+    move_rating, enemy_length, enemy_head =\
+        snake_functions.avoid_bigger_snakes(move_rating,
+                                            game_state,
+                                            moves,
+                                            my_id,
+                                            my_potential_movements)
 
     # Step 4 - Prevent your Battlesnake from turning into dead ends
+
     snake_density = []
-    for element in all_snakes.meat:
-        snake_density.append({'x':element['x']+1, 'y': element['y']})
-        snake_density.append({'x':element['x']-1, 'y': element['y']})
-        snake_density.append({'x':element['x'], 'y': element['y']+1})
-        snake_density.append({'x':element['x'], 'y': element['y']-1})
-    for element in my_board.wall:
-        snake_density.append({'x':element['x']+1, 'y': element['y']})
-        snake_density.append({'x':element['x']-1, 'y': element['y']})
-        snake_density.append({'x':element['x'], 'y': element['y']+1})
-        snake_density.append({'x':element['x'], 'y': element['y']-1})
-    
-    from collections import Counter
+    for collection in [all_snakes.meat, my_board.wall]:
+        for element in collection:
+            snake_functions.add_adjacent_positions(element, snake_density)
+
     # Convert each dictionary to a tuple of its items
     dict_tuples = [tuple(d.items()) for d in snake_density]
     # Count occurrences of each dictionary (as tuples)
     counts = Counter(dict_tuples)
     # Filter dictionaries with at least 3 duplicates
     dense_tiles_1 = [dict(tpl) for tpl, count in counts.items() if count >= 3]
+    dense_tiles_1 = snake_functions.remove_matching_dicts(dense_tiles_1, all_snakes.meat)
 
     move_rating, dense = snake_functions.minimize_distance(my_head,
                                     my_potential_movements,
@@ -125,13 +118,16 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                     board_height,
                                     board_width,
                                     max_dist=2,
-                                    weight=-0.0)
+                                    weight=-0.1)
     
     dict_tuples = [tuple(d.items()) for d in snake_density]
     # Count occurrences of each dictionary (as tuples)
     counts = Counter(dict_tuples)
     # Filter dictionaries with at least 3 duplicates
     dense_tiles_2 = [dict(tpl) for tpl, count in counts.items() if count >= 4]
+    dense_tiles_2 = snake_functions.remove_matching_dicts(dense_tiles_2, all_snakes.meat)
+    print(f"The densist tiles are: {dense_tiles_2}")
+
 
     move_rating, dense = snake_functions.minimize_distance(my_head,
                                     my_potential_movements,
@@ -140,7 +136,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                     board_height,
                                     board_width,
                                     max_dist = 1,
-                                    weight=-0.3)
+                                    weight=-0.4)
 
 
 
