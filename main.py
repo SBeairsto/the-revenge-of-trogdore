@@ -111,6 +111,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     dense_tiles_1 = [dict(tpl) for tpl, count in counts.items() if count >= 3]
     dense_tiles_1 = snake_functions.remove_matching_dicts(dense_tiles_1, all_snakes.meat)
     dense_tiles_1 = snake_functions.remove_matching_dicts(dense_tiles_1, walls)
+    dense_tiles_1 = snake_functions.remove_matching_dicts(dense_tiles_1, my_board.corners)
 
     move_rating, dense = snake_functions.minimize_distance(my_head,
                                     my_potential_movements,
@@ -119,7 +120,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                     board_height,
                                     board_width,
                                     max_dist=2,
-                                    weight=-0.05)
+                                    weight=-0.15)
     
     dict_tuples = [tuple(d.items()) for d in snake_density]
     # Count occurrences of each dictionary (as tuples)
