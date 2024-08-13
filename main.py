@@ -148,6 +148,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     food = game_state['board']['food']
     am_I_hungry = False
     am_I_hunting = False
+    
     if len(game_state['board']['snakes']) == 1:
         length_diff = 0
     else:
@@ -161,8 +162,10 @@ def move(game_state: typing.Dict) -> typing.Dict:
     
     if length_diff >= 2:
         am_I_hunting = True
+        am_I_hungry = False
     else:
         am_I_hunting = False
+        am_I_hungry = True
 
     if am_I_hungry:
         move_rating, close_food = snake_functions.minimize_distance(my_head,
@@ -175,6 +178,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                         weight=0.1)
 
     print(f"AM I HUNTING?: {am_I_hunting}")
+    print(f"AM I HUNGRY?: {am_I_hungry}")
     if (am_I_hunting) & (am_I_hungry==False):
         
         move_rating, close_head = snake_functions.minimize_distance(my_head,
