@@ -79,7 +79,7 @@ def avoid_bigger_snakes(move_rating: Dict,
             if enemy['length'] >= game_state['you']['length']:
                 for move in moves:
                     if getattr(my_potential_movements, move) in enemy_potential_movements.all:
-                        move_rating[move] -= 0.5
+                        move_rating[move] -= 1
     return move_rating, enemy_length, enemy_head
 
 
