@@ -17,23 +17,24 @@ def check_move(is_move_safe: Dict,
 
 
 def minimize_distance(my_head: Dict,
-                          my_potential_movements: potential_movements,
-                          targets: List,
-                          move_rating: Dict,
-                          board_height: int,
-                          board_width: int,
-                          max_dist: int,
-                          weight: float) -> Dict:
+                        my_potential_movements: potential_movements,
+                        targets: List,
+                        move_rating: Dict,
+                        board_height: int,
+                        board_width: int,
+                        max_dist: int,
+                        weight: float) -> Dict:
 
     min_distance = board_width*board_height
-    if min_distance > max_dist:
-        return move_rating, min_distance
 
     for element in targets:
         distance = abs(element['x'] - my_head['x']) +\
                 abs(element['y'] - my_head['y'])
         if distance < min_distance:
             min_distance = distance
+
+    if min_distance > max_dist:
+        return move_rating, min_distance
 
     for element in targets:
         potential_distance = abs(element['x'] -

@@ -110,6 +110,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     # Filter dictionaries with at least 3 duplicates
     dense_tiles_1 = [dict(tpl) for tpl, count in counts.items() if count >= 3]
     dense_tiles_1 = snake_functions.remove_matching_dicts(dense_tiles_1, all_snakes.meat)
+    dense_tiles_1 = snake_functions.remove_matching_dicts(dense_tiles_1, walls)
 
     move_rating, dense = snake_functions.minimize_distance(my_head,
                                     my_potential_movements,
@@ -118,7 +119,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                     board_height,
                                     board_width,
                                     max_dist=2,
-                                    weight=-0.1)
+                                    weight=-0.2)
     
     dict_tuples = [tuple(d.items()) for d in snake_density]
     # Count occurrences of each dictionary (as tuples)
@@ -126,7 +127,9 @@ def move(game_state: typing.Dict) -> typing.Dict:
     # Filter dictionaries with at least 3 duplicates
     dense_tiles_2 = [dict(tpl) for tpl, count in counts.items() if count >= 4]
     dense_tiles_2 = snake_functions.remove_matching_dicts(dense_tiles_2, all_snakes.meat)
+    dense_tiles_2 = snake_functions.remove_matching_dicts(dense_tiles_2, walls)
     print(f"The densist tiles are: {dense_tiles_2}")
+    print(f"The second densist tiles are: {dense_tiles_1}")
 
 
     move_rating, dense = snake_functions.minimize_distance(my_head,
@@ -189,7 +192,8 @@ def move(game_state: typing.Dict) -> typing.Dict:
 
     next_move = max(move_rating, key=move_rating.get)
 
-    #print(f"MOVE {game_state['turn']}: {next_move}")
+    print(f"MOVE {game_state['turn']}: {next_move}")
+    print(f"The move ratings were: {move_rating}")
     #print(f"CLOSEST FOOD: {close_food}")
     return {"move": next_move}
 
