@@ -155,7 +155,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
 
     # weight how hungry you are based on how much larger of a snake you are.
     # If you are way bigger, press your advantage
-    if game_state['you']['health'] < 30:
+    if game_state['you']['health'] < 15:
         am_I_hungry = True
         am_I_hunting = False
     
@@ -164,10 +164,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
     else:
         am_I_hunting = False
 
-    am_I_hungry = True
-    am_I_hunting = False
-
-    if (am_I_hungry) & (am_I_hunting==False):
+    if am_I_hungry:
         move_rating, close_food = snake_functions.minimize_distance(my_head,
                                         my_potential_movements,
                                         food,
@@ -177,7 +174,8 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                         max_dist=board_height*board_width,
                                         weight=0.1)
 
-    if am_I_hunting:
+    print(f"AM I HUNTING?: {am_I_hunting}")
+    if (am_I_hunting) & (am_I_hungry==False):
         
         move_rating, close_head = snake_functions.minimize_distance(my_head,
                                         my_potential_movements,
@@ -190,8 +188,8 @@ def move(game_state: typing.Dict) -> typing.Dict:
 
     next_move = max(move_rating, key=move_rating.get)
 
-    print(f"MOVE {game_state['turn']}: {next_move}")
-    print(f"CLOSEST FOOD: {close_food}")
+    #print(f"MOVE {game_state['turn']}: {next_move}")
+    #print(f"CLOSEST FOOD: {close_food}")
     return {"move": next_move}
 
 
