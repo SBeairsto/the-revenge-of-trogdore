@@ -119,7 +119,7 @@ def move(game_state: typing.Dict) -> typing.Dict:
                                     board_height,
                                     board_width,
                                     max_dist=2,
-                                    weight=-0.2)
+                                    weight=-0.05)
     
     dict_tuples = [tuple(d.items()) for d in snake_density]
     # Count occurrences of each dictionary (as tuples)
